@@ -1,7 +1,9 @@
 ember-embedded-snippet
 ==============================================================================
 
-[Short description of the addon.]
+![CI](https://github.com/kaliber5/ember-embedded-snippet/workflows/CI/badge.svg)
+
+Ember your Ember app into external pages with a simple JavaScript snippet.
 
 
 Compatibility
@@ -23,7 +25,20 @@ ember install ember-embedded-snippet
 Usage
 ------------------------------------------------------------------------------
 
-[Longer description of how to use the addon in apps.]
+Add a snippet like this to your static or server rendered HTML page:
+
+```html
+<div id="embedded"></div>
+<script src="https://www.your-deployed-ember-app.com/embed.js"></script>
+<script type="text/javascript">
+  emberEmbeddedSnippet({
+    root: '#embedded',
+    options: {
+      foo: 'bar' // will be added to your APP config, see https://github.com/peopledoc/ember-cli-embedded
+    }
+  });
+</script>
+```
 
 
 Contributing
