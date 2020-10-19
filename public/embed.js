@@ -1,9 +1,6 @@
 (function() {
 
-  var _config = {};
-
-  var retryCount = 5;
-
+  let _config = {};
 
   function debug(msg) {
     if (_config.debug && window.console && window.console.log) {
@@ -11,67 +8,60 @@
     }
   }
 
-  function injectScripts(jsUrls, cb) {
-    var count = jsUrls.length;
-    var loaded = 0;
-    var nextUrl;
+  function injectScript(src) {
+    return new Promise((resolve) => {
+      let scriptTag = document.createElement('script');
+      scriptTag.type = "text/javascript";
+      scriptTag.src = src;
+      scriptTag.onload = resolve;
+      debug('Injecting script: ' + src);
+      document.getElementsByTagName("head")[0].appendChild(scriptTag);
+    });
+  }
 
-    function next() {
-
-      if (loaded < count) {
-        var scriptTag = document.createElement('script');
-        nextUrl = jsUrls[loaded++];
-        scriptTag.type = "text/javascript";
-        scriptTag.src = nextUrl;
-        scriptTag.onload = next;
-        debug('Injecting script: ' + nextUrl);
-        (document.getElementsByTagName("head")[0] || document.documentElement).appendChild(scriptTag);
-      } else {
-        if (cb) {
-          cb();
-        }
-      }
+  async function injectScripts(jsUrls) {
+    for (let src of jsUrls) {
+      await injectScript(src);
     }
-
-    next();
   }
 
   function injectStyles(cssUrls) {
-    cssUrls.forEach(function(value, key){
-      var cssSelector = "link[href='" + value + "']";
+    cssUrls.forEach((src) => {
+      let cssSelector = "link[href='" + src + "']";
 
       if (document.querySelector(cssSelector) === null) {
 
-        var cssLink = document.createElement("link");
+        let cssLink = document.createElement("link");
         cssLink.setAttribute('rel', "stylesheet");
         cssLink.setAttribute('type', "text/css");
-        cssLink.setAttribute('href', value);
-        debug('Injecting style: ' + value);
+        cssLink.setAttribute('href', src);
+        debug('Injecting style: ' + src);
         document.getElementsByTagName('head')[0].appendChild(cssLink);
       }
     });
   }
 
-  function main() {
+  async function main() {
     // Fetch host from our own script tag
-    var scriptTag = document.querySelector('script[src$="/embed.js"]');
+    let scriptTag = document.querySelector('script[src$="/embed.js"]');
     if (!scriptTag) throw new Error('ember-embedded-snippet: Cannot find own script tag');
 
-    var host = scriptTag.src.replace(/(https?:\/\/.*?)\/.*/g, '$1');
+    let host = scriptTag.src.replace(/(https?:\/\/.*?)\/.*/g, '$1');
 
-    var cssUrls = [
+    let cssUrls = [
       prependHostIfRequired('/assets/vendor.css', host),
       prependHostIfRequired('/assets/###APPNAME###.css', host)
     ];
 
     injectStyles(cssUrls);
 
-    var jsUrls = [
+    let jsUrls = [
       prependHostIfRequired('/assets/vendor.js', host),
       prependHostIfRequired('/assets/###APPNAME###.js', host)
     ];
 
-    injectScripts(jsUrls, startApp);
+    await injectScripts(jsUrls);
+    startApp();
   }
 
   function prependHostIfRequired(url, host) {
@@ -79,49 +69,61 @@
   }
 
   function ready(fn) {
-    if (document.readyState != 'loading'){
+    if (document.readyState !== 'loading'){
       fn();
     } else {
       document.addEventListener('DOMContentLoaded', fn);
     }
   }
 
+  function deepExtend(out) {
+    out = out || {};
 
-  function startApp() {
-    var appName = _config.appName || 'emberEmbeddedApp';
-    var app = window[appName];
-    if (!app) {
-      if (0 < retryCount--) {
-        debug('ember-embedded-snippet: no app found: ' + appName + ', retrying...');
-        setTimeout(startApp, 100);
-      } else {
-        debug('ember-embedded-snippet: no app found: ' + appName + ', aborting!');
-      }
-      return;
-    }
+    for (let i = 1; i < arguments.length; i++) {
+      let obj = arguments[i];
 
-    var deepExtend = function(out) {
-      out = out || {};
+      if (!obj)
+        continue;
 
-      for (var i = 1; i < arguments.length; i++) {
-        var obj = arguments[i];
-
-        if (!obj)
-          continue;
-
-        for (var key in obj) {
-          if (obj.hasOwnProperty(key)) {
-            if (typeof obj[key] === 'object')
-              out[key] = deepExtend(out[key], obj[key]);
-            else
-              out[key] = obj[key];
-          }
+      for (let key in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+          if (typeof obj[key] === 'object')
+            out[key] = deepExtend(out[key], obj[key]);
+          else
+            out[key] = obj[key];
         }
       }
+    }
 
-      return out;
-    };
-    var appOptions = deepExtend({ rootElement: _config.root }, _config.options);
+    return out;
+  }
+
+  function delay(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  async function waitForApp(appName) {
+    let retryCount = 10;
+    let app = window[appName];
+
+    while (!app && retryCount > 0) {
+      debug('ember-embedded-snippet: no app found: ' + appName + ', retrying...');
+      await delay(100);
+      app = window[appName];
+    }
+
+    if (!app) {
+      throw new Error('ember-embedded-snippet: no app found: ' + appName + ', aborting!');
+    }
+
+    return app;
+  }
+
+  async function startApp() {
+    let appName = _config.appName || 'emberEmbeddedApp';
+    let app = await waitForApp(appName);
+
+    let appOptions = deepExtend({ rootElement: _config.root }, _config.options);
 
     debug('Starting ember app');
     app.start(appOptions);
