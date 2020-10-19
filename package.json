@@ -1,6 +1,6 @@
 {
   "name": "ember-embedded-snippet",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "Embed Ember apps into external pages with a simple snippet",
   "keywords": [
     "ember-addon"
