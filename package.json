@@ -25,7 +25,7 @@
   "dependencies": {
     "broccoli-concat": "^4.2.4",
     "broccoli-replace": "^0.12.0",
-    "ember-cli-babel": "^7.22.1",
+    "ember-cli-babel": "^7.23.1",
     "ember-cli-embedded": "^1.0.0",
     "ember-cli-htmlbars": "^5.3.1",
     "ember-export-application-global": "^2.0.1",
