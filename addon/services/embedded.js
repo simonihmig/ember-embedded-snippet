@@ -1,5 +1,4 @@
 import Service from '@ember/service';
-import { computed } from '@ember/object';
 
 export default class EmbeddedService extends Service {
 
@@ -10,7 +9,6 @@ export default class EmbeddedService extends Service {
    * @type string
    * @public
    */
-  @computed()
   get originHost() {
     let scriptTag = document.querySelector('script[src$="/embed.js"]');
 
