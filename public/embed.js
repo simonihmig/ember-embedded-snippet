@@ -42,11 +42,17 @@
   }
 
   async function main() {
-    // Fetch host from our own script tag
-    let scriptTag = document.querySelector('script[src$="/embed.js"]');
-    if (!scriptTag) throw new Error('ember-embedded-snippet: Cannot find own script tag');
+    let host = _config.host;
 
-    let host = scriptTag.src.replace(/(https?:\/\/.*?)\/.*/g, '$1');
+    if (!host) {
+      // Fetch host from our own script tag
+      let scriptTag = document.querySelector('script[src$="/embed.js"]');
+      if (!scriptTag) throw new Error('ember-embedded-snippet: Cannot find own script tag');
+
+      host = scriptTag.src.replace(/(https?:\/\/.*?)\/.*/g, '$1');
+    }
+
+    host = host.replace(/\/$/, '');
 
     let cssUrls = [
       prependHostIfRequired('/assets/vendor.css', host),
