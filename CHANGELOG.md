@@ -1,3 +1,19 @@
+## v0.4.1 (2021-03-23)
+
+#### :rocket: Enhancement
+* [#76](https://github.com/kaliber5/ember-embedded-snippet/pull/76) Add `host` option to explicitly define the host ([@simonihmig](https://github.com/simonihmig))
+
+#### :memo: Documentation
+* [#77](https://github.com/kaliber5/ember-embedded-snippet/pull/77) Add documentation for the available config options ([@simonihmig](https://github.com/simonihmig))
+
+#### :house: Internal
+* [#6](https://github.com/kaliber5/ember-embedded-snippet/pull/6) Update release-it and release-it-lerna-changelog. ([@rwjblue](https://github.com/rwjblue))
+
+#### Committers: 3
+- Robert Jackson ([@rwjblue](https://github.com/rwjblue))
+- Simon Ihmig ([@simonihmig](https://github.com/simonihmig))
+- [@dependabot-preview[bot]](https://github.com/apps/dependabot-preview)
+
 ## v0.4.0 (2020-10-19)
 
 #### :boom: Breaking Change
