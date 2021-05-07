@@ -1,3 +1,5 @@
+/* global require */
+
 (function() {
 
   let _config = {};
@@ -82,57 +84,14 @@
     }
   }
 
-  function deepExtend(out) {
-    out = out || {};
-
-    for (let i = 1; i < arguments.length; i++) {
-      let obj = arguments[i];
-
-      if (!obj)
-        continue;
-
-      for (let key in obj) {
-        if (Object.prototype.hasOwnProperty.call(obj, key)) {
-          if (typeof obj[key] === 'object')
-            out[key] = deepExtend(out[key], obj[key]);
-          else
-            out[key] = obj[key];
-        }
-      }
-    }
-
-    return out;
-  }
-
-  function delay(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
-
-  async function waitForApp(appName) {
-    let retryCount = 10;
-    let app = window[appName];
-
-    while (!app && retryCount > 0) {
-      debug('ember-embedded-snippet: no app found: ' + appName + ', retrying...');
-      await delay(100);
-      app = window[appName];
-    }
-
-    if (!app) {
-      throw new Error('ember-embedded-snippet: no app found: ' + appName + ', aborting!');
-    }
-
-    return app;
-  }
-
   async function startApp() {
-    let appName = _config.appName || 'emberEmbeddedApp';
-    let app = await waitForApp(appName);
+    debug(`Starting ember app "###APPNAME###"`);
 
-    let appOptions = deepExtend({ rootElement: _config.root }, _config.options);
-
-    debug('Starting ember app');
-    app.start(appOptions);
+    return require('###APPNAME###/app').default.create({
+      // rootElement: this.#shadowRoot.querySelector(`[data-ember-root-element]`),
+      rootElement: _config.root,
+      config: _config.options
+    })
   }
 
   window.emberEmbeddedSnippet = function(config) {

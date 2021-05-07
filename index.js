@@ -17,12 +17,8 @@ module.exports = {
     // do not store config in meta tag
     app.options.storeConfigInMeta = false;
 
-
-    let config = this.project.config(app.env).embedded;
-    if (!config || config.delegateStart === undefined) {
-      this.ui.writeWarnLine('No embedded.delegateStart config found. Please set this to true to enable ember-embedded-snippet to pass a custom config!');
-    }
-
+    // we start the app explicitly
+    app.options.autoRun = false;
   },
 
   treeForPublic: function(tree) {
