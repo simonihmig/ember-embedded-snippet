@@ -10,9 +10,18 @@
     {{content-for "head"}}
     {{content-for "test-head"}}
 
-    <link rel="stylesheet" href="{{rootURL}}assets/vendor.css">
-    <link rel="stylesheet" href="{{rootURL}}assets/dummy.css">
     <link rel="stylesheet" href="{{rootURL}}assets/test-support.css">
+
+    <style type="text/css">
+      .title {
+        color: #f00 !important;
+      }
+
+      .something {
+        color: #f00;
+      }
+
+    </style>
 
     {{content-for "head-footer"}}
     {{content-for "test-head-footer"}}
@@ -26,6 +35,8 @@
     <script src="{{rootURL}}assets/test-support.js"></script>
     <script src="{{rootURL}}assets/dummy.js"></script>
     <script src="{{rootURL}}assets/tests.js"></script>
+
+    <script src="{{rootURL}}embed.js"></script>
 
     {{content-for "body-footer"}}
     {{content-for "test-body-footer"}}

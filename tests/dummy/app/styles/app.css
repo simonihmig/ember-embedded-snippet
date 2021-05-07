@@ -2,6 +2,10 @@ body, :host {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
-h2 {
-  color: royalblue;
+.title {
+  color: #00f;
+}
+
+.something {
+  color: #00f !important;
 }

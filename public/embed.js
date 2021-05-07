@@ -27,7 +27,7 @@
     cssUrls.forEach((src) => {
       let cssSelector = "link[href='" + src + "']";
 
-      if (document.querySelector(cssSelector) === null) {
+      if (head.querySelector(cssSelector) === null) {
 
         let cssLink = document.createElement("link");
         cssLink.setAttribute('rel', "stylesheet");
@@ -99,7 +99,7 @@
         head = rootParent
       } else {
         this.#rootElement = this;
-        head = document.getElementsByTagName('head')[0];
+        head = this;
       }
 
       await setup(head);
@@ -108,7 +108,7 @@
     }
 
     disconnectedCallback() {
-      if (!this.#application.isDestroyed && !this.#application.isDestroying) {
+      if (this.#application && !this.#application.isDestroyed && !this.#application.isDestroying) {
         this.#application.destroy();
       }
     }
