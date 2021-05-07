@@ -6,24 +6,24 @@
     console.debug('[ember-embedded-snippet] %s', msg);
   }
 
-  function injectScript(src) {
+  function injectScript(src, head) {
     return new Promise((resolve) => {
       let scriptTag = document.createElement('script');
       scriptTag.type = "text/javascript";
       scriptTag.src = src;
       scriptTag.onload = resolve;
       debug('Injecting script: ' + src);
-      document.getElementsByTagName("head")[0].appendChild(scriptTag);
+      head.appendChild(scriptTag);
     });
   }
 
-  async function injectScripts(jsUrls) {
+  async function injectScripts(jsUrls, head) {
     for (let src of jsUrls) {
-      await injectScript(src);
+      await injectScript(src, head);
     }
   }
 
-  function injectStyles(cssUrls) {
+  function injectStyles(cssUrls, head) {
     cssUrls.forEach((src) => {
       let cssSelector = "link[href='" + src + "']";
 
@@ -34,12 +34,12 @@
         cssLink.setAttribute('type', "text/css");
         cssLink.setAttribute('href', src);
         debug('Injecting style: ' + src);
-        document.getElementsByTagName('head')[0].appendChild(cssLink);
+        head.appendChild(cssLink);
       }
     });
   }
 
-  async function setup(host) {
+  async function setup(head, host) {
     if (!host) {
       // Fetch host from our own script tag
       let scriptTag = document.querySelector('script[src$="/embed.js"]');
@@ -55,14 +55,14 @@
       prependHostIfRequired('/assets/###APPNAME###.css', host)
     ];
 
-    injectStyles(cssUrls);
+    injectStyles(cssUrls, head);
 
     let jsUrls = [
       prependHostIfRequired('/assets/vendor.js', host),
       prependHostIfRequired('/assets/###APPNAME###.js', host)
     ];
 
-    await injectScripts(jsUrls);
+    await injectScripts(jsUrls, head);
   }
 
   function prependHostIfRequired(url, host) {
@@ -73,7 +73,6 @@
     debug(`Starting ember app "###APPNAME###"`);
 
     return require('###APPNAME###/app').default.create({
-      // rootElement: this.#shadowRoot.querySelector(`[data-ember-root-element]`),
       rootElement,
       config
     })
@@ -81,23 +80,29 @@
 
   class EmbeddedApp extends HTMLElement {
     #rootElement;
-    #setupPromise;
     #application;
-
-    constructor() {
-      super();
-
-      this.#rootElement = this;
-
-      this.#setupPromise = setup();
-    }
+    #shadowRoot;
 
     async connectedCallback() {
       if (this.#application) {
         return;
       }
 
-      await this.#setupPromise;
+      let head;
+      if (this.getAttribute('shadow') !== null) {
+        this.#shadowRoot = this.attachShadow({ mode: 'open'});
+        const rootParent = document.createElement('div');
+        const rootElement = document.createElement('div')
+        rootParent.appendChild(rootElement);
+        this.#shadowRoot.appendChild(rootParent)
+        this.#rootElement = rootElement;
+        head = rootParent
+      } else {
+        this.#rootElement = this;
+        head = document.getElementsByTagName('head')[0];
+      }
+
+      await setup(head);
 
       this.#application = await startApp(this.#rootElement);
     }

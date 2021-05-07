@@ -9,14 +9,26 @@
 
     {{content-for "head"}}
 
+    <style type="text/css">
+      body, :host {
+        font-family: serif;
+      }
+
+      h2 {
+        color: darkred !important;
+      }
+
+    </style>
+
     {{content-for "head-footer"}}
   </head>
   <body>
     {{content-for "body"}}
 
-    <div id="embedded"></div>
     <script src="{{rootURL}}embed.js"></script>
-    <dummy-app/>
+    <dummy-app shadow></dummy-app>
+
+    <h2>Outside of Ember</h2>
 
     {{content-for "body-footer"}}
   </body>
