@@ -2,12 +2,8 @@
 
 (function() {
 
-  let _config = {};
-
   function debug(msg) {
-    if (_config.debug && window.console && window.console.log) {
-      window.console.log('[ember-embedded-snippet] %s', msg);
-    }
+    console.debug('[ember-embedded-snippet] %s', msg);
   }
 
   function injectScript(src) {
@@ -43,9 +39,7 @@
     });
   }
 
-  async function main() {
-    let host = _config.host;
-
+  async function setup(host) {
     if (!host) {
       // Fetch host from our own script tag
       let scriptTag = document.querySelector('script[src$="/embed.js"]');
@@ -69,43 +63,56 @@
     ];
 
     await injectScripts(jsUrls);
-    startApp();
   }
 
   function prependHostIfRequired(url, host) {
     return url.match(/^https?:\/\/.*/) ? url : host + url;
   }
 
-  function ready(fn) {
-    if (document.readyState !== 'loading'){
-      fn();
-    } else {
-      document.addEventListener('DOMContentLoaded', fn);
-    }
-  }
-
-  async function startApp() {
+  async function startApp(rootElement, config = {}) {
     debug(`Starting ember app "###APPNAME###"`);
 
     return require('###APPNAME###/app').default.create({
       // rootElement: this.#shadowRoot.querySelector(`[data-ember-root-element]`),
-      rootElement: _config.root,
-      config: _config.options
+      rootElement,
+      config
     })
   }
 
-  window.emberEmbeddedSnippet = function(config) {
-    if (!config) {
-      throw new Error('ember-embedded-snippet: missing config');
+  class EmbeddedApp extends HTMLElement {
+    #rootElement;
+    #setupPromise;
+    #application;
+
+    constructor() {
+      super();
+
+      this.#rootElement = this;
+
+      this.#setupPromise = setup();
     }
 
-    if (config.root === undefined) {
-      throw new Error('ember-embedded-snippet: missing root');
+    async connectedCallback() {
+      if (this.#application) {
+        return;
+      }
+
+      await this.#setupPromise;
+
+      this.#application = await startApp(this.#rootElement);
     }
 
-    _config = config;
+    disconnectedCallback() {
+      if (!this.#application.isDestroyed && !this.#application.isDestroying) {
+        this.#application.destroy();
+      }
+    }
+  }
 
-    ready(main);
-  };
+  let customElementName = '###APPNAME###';
+  if (!customElementName.includes('-')) {
+    customElementName += '-app';
+  }
 
+  customElements.define(customElementName, EmbeddedApp);
 })();
