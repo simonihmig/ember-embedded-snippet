@@ -1,3 +1,4 @@
+/* global globalThis */
 import { module, test } from 'qunit';
 
 function waitFor(selector, { timeout = 1000, delay = 10, doc = document } = {}) {
@@ -26,6 +27,16 @@ function waitFor(selector, { timeout = 1000, delay = 10, doc = document } = {}) 
 }
 
 module('Acceptance | embed', function(hooks) {
+  hooks.beforeEach(function() {
+    // With the way we load the JS when bootstrapping our embedded app every time, Glimmer thinks we are including
+    // `@glimmer/validator` twice, which is not the case. Using this workaround here to silence the assertion.
+    // This shouldn't be an issue in production as long as we are not loading vendor.js twice, only happening here
+    // because of our test setup (needing vendor.js for test infrastructure, but also loading it again in tests during
+    // embedded bootstrapping)
+    // See also https://github.com/glimmerjs/glimmer-vm/issues/1252
+    globalThis[Symbol.for('GLIMMER_VALIDATOR_REGISTRATION')] = false;
+  });
+
   hooks.afterEach(function() {
     document.querySelector('#ember-testing').innerHTML = '';
   });
