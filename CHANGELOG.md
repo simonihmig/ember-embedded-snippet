@@ -1,3 +1,15 @@
+## v0.5.0-beta.0 (2021-05-10)
+
+#### :boom: Breaking Change
+* [#102](https://github.com/kaliber5/ember-embedded-snippet/pull/102) Refactor to WebComponent, with optional shadow DOM ([@simonihmig](https://github.com/simonihmig))
+
+#### :rocket: Enhancement
+* [#102](https://github.com/kaliber5/ember-embedded-snippet/pull/102) Refactor to WebComponent, with optional shadow DOM ([@simonihmig](https://github.com/simonihmig))
+
+#### Committers: 2
+- Simon Ihmig ([@simonihmig](https://github.com/simonihmig))
+- [@dependabot-preview[bot]](https://github.com/apps/dependabot-preview)
+
 ## v0.4.1 (2021-03-23)
 
 #### :rocket: Enhancement
