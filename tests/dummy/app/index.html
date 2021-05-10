@@ -9,22 +9,26 @@
 
     {{content-for "head"}}
 
+    <style type="text/css">
+      body {
+        font-family: serif;
+      }
+
+      h2 {
+        color: #f00 !important;
+      }
+
+    </style>
+
     {{content-for "head-footer"}}
   </head>
   <body>
     {{content-for "body"}}
 
-    <div id="embedded"></div>
     <script src="{{rootURL}}embed.js"></script>
-    <script type="text/javascript">
-      emberEmbeddedSnippet({
-        root: '#embedded',
-        debug: true,
-        options: {
-          name: 'MyEmbeddedApp'
-        }
-      });
-    </script>
+    <dummy-app shadow></dummy-app>
+
+    <h2>Outside of Ember</h2>
 
     {{content-for "body-footer"}}
   </body>

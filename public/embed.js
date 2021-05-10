@@ -1,49 +1,45 @@
+/* global require */
+
 (function() {
 
-  let _config = {};
-
   function debug(msg) {
-    if (_config.debug && window.console && window.console.log) {
-      window.console.log('[ember-embedded-snippet] %s', msg);
-    }
+    console.debug('[ember-embedded-snippet] %s', msg);
   }
 
-  function injectScript(src) {
+  function injectScript(src, head) {
     return new Promise((resolve) => {
       let scriptTag = document.createElement('script');
       scriptTag.type = "text/javascript";
       scriptTag.src = src;
       scriptTag.onload = resolve;
       debug('Injecting script: ' + src);
-      document.getElementsByTagName("head")[0].appendChild(scriptTag);
+      head.appendChild(scriptTag);
     });
   }
 
-  async function injectScripts(jsUrls) {
+  async function injectScripts(jsUrls, head) {
     for (let src of jsUrls) {
-      await injectScript(src);
+      await injectScript(src, head);
     }
   }
 
-  function injectStyles(cssUrls) {
+  function injectStyles(cssUrls, head) {
     cssUrls.forEach((src) => {
       let cssSelector = "link[href='" + src + "']";
 
-      if (document.querySelector(cssSelector) === null) {
+      if (head.querySelector(cssSelector) === null) {
 
         let cssLink = document.createElement("link");
         cssLink.setAttribute('rel', "stylesheet");
         cssLink.setAttribute('type', "text/css");
         cssLink.setAttribute('href', src);
         debug('Injecting style: ' + src);
-        document.getElementsByTagName('head')[0].appendChild(cssLink);
+        head.appendChild(cssLink);
       }
     });
   }
 
-  async function main() {
-    let host = _config.host;
-
+  async function setup(head, host) {
     if (!host) {
       // Fetch host from our own script tag
       let scriptTag = document.querySelector('script[src$="/embed.js"]');
@@ -59,94 +55,69 @@
       prependHostIfRequired('/assets/###APPNAME###.css', host)
     ];
 
-    injectStyles(cssUrls);
+    injectStyles(cssUrls, head);
 
     let jsUrls = [
       prependHostIfRequired('/assets/vendor.js', host),
       prependHostIfRequired('/assets/###APPNAME###.js', host)
     ];
 
-    await injectScripts(jsUrls);
-    startApp();
+    await injectScripts(jsUrls, head);
   }
 
   function prependHostIfRequired(url, host) {
     return url.match(/^https?:\/\/.*/) ? url : host + url;
   }
 
-  function ready(fn) {
-    if (document.readyState !== 'loading'){
-      fn();
-    } else {
-      document.addEventListener('DOMContentLoaded', fn);
-    }
+  async function startApp(rootElement, config = {}) {
+    debug(`Starting ember app "###APPNAME###"`);
+
+    return require('###APPNAME###/app').default.create({
+      rootElement,
+      config
+    })
   }
 
-  function deepExtend(out) {
-    out = out || {};
+  class EmbeddedApp extends HTMLElement {
+    #rootElement;
+    #application;
+    #shadowRoot;
 
-    for (let i = 1; i < arguments.length; i++) {
-      let obj = arguments[i];
+    async connectedCallback() {
+      if (this.#application) {
+        return;
+      }
 
-      if (!obj)
-        continue;
+      let head;
+      if (this.getAttribute('shadow') !== null) {
+        this.#shadowRoot = this.attachShadow({ mode: 'open'});
+        const rootParent = document.createElement('div');
+        const rootElement = document.createElement('div')
+        rootParent.appendChild(rootElement);
+        this.#shadowRoot.appendChild(rootParent)
+        this.#rootElement = rootElement;
+        head = rootParent
+      } else {
+        this.#rootElement = this;
+        head = this;
+      }
 
-      for (let key in obj) {
-        if (Object.prototype.hasOwnProperty.call(obj, key)) {
-          if (typeof obj[key] === 'object')
-            out[key] = deepExtend(out[key], obj[key]);
-          else
-            out[key] = obj[key];
-        }
+      await setup(head);
+
+      this.#application = await startApp(this.#rootElement);
+    }
+
+    disconnectedCallback() {
+      if (this.#application && !this.#application.isDestroyed && !this.#application.isDestroying) {
+        this.#application.destroy();
       }
     }
-
-    return out;
   }
 
-  function delay(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
+  let customElementName = '###APPNAME###';
+  if (!customElementName.includes('-')) {
+    customElementName += '-app';
   }
 
-  async function waitForApp(appName) {
-    let retryCount = 10;
-    let app = window[appName];
-
-    while (!app && retryCount > 0) {
-      debug('ember-embedded-snippet: no app found: ' + appName + ', retrying...');
-      await delay(100);
-      app = window[appName];
-    }
-
-    if (!app) {
-      throw new Error('ember-embedded-snippet: no app found: ' + appName + ', aborting!');
-    }
-
-    return app;
-  }
-
-  async function startApp() {
-    let appName = _config.appName || 'emberEmbeddedApp';
-    let app = await waitForApp(appName);
-
-    let appOptions = deepExtend({ rootElement: _config.root }, _config.options);
-
-    debug('Starting ember app');
-    app.start(appOptions);
-  }
-
-  window.emberEmbeddedSnippet = function(config) {
-    if (!config) {
-      throw new Error('ember-embedded-snippet: missing config');
-    }
-
-    if (config.root === undefined) {
-      throw new Error('ember-embedded-snippet: missing root');
-    }
-
-    _config = config;
-
-    ready(main);
-  };
-
+  customElements.define(customElementName, EmbeddedApp);
 })();
