@@ -77,6 +77,9 @@
     });
   }
 
+  // list all attributes to our CE that we handle by ourself. All others are passed as custom arguments to the app...
+  const ownAttributes = ['shadow', 'class'];
+
   class EmbeddedApp extends HTMLElement {
     #rootElement;
     #application;
@@ -104,6 +107,10 @@
       await setup(head);
 
       this.#application = await startApp(this.#rootElement);
+
+      this.#application.register('config:embedded', this.customArgs, {
+        instantiate: false,
+      });
     }
 
     disconnectedCallback() {
@@ -114,6 +121,17 @@
       ) {
         this.#application.destroy();
       }
+    }
+
+    get customArgs() {
+      const args = this.getAttributeNames()
+        .filter((attr) => !ownAttributes.includes(attr))
+        .reduce(
+          (args, attr) => ({ ...args, [attr]: this.getAttribute(attr) }),
+          {}
+        );
+
+      return Object.freeze(args);
     }
   }
 
