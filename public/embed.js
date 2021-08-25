@@ -1,7 +1,6 @@
 /* global require */
 
-(function() {
-
+(function () {
   function debug(msg) {
     console.debug('[ember-embedded-snippet] %s', msg);
   }
@@ -9,7 +8,7 @@
   function injectScript(src, head) {
     return new Promise((resolve) => {
       let scriptTag = document.createElement('script');
-      scriptTag.type = "text/javascript";
+      scriptTag.type = 'text/javascript';
       scriptTag.src = src;
       scriptTag.onload = resolve;
       debug('Injecting script: ' + src);
@@ -28,10 +27,9 @@
       let cssSelector = "link[href='" + src + "']";
 
       if (head.querySelector(cssSelector) === null) {
-
-        let cssLink = document.createElement("link");
-        cssLink.setAttribute('rel', "stylesheet");
-        cssLink.setAttribute('type', "text/css");
+        let cssLink = document.createElement('link');
+        cssLink.setAttribute('rel', 'stylesheet');
+        cssLink.setAttribute('type', 'text/css');
         cssLink.setAttribute('href', src);
         debug('Injecting style: ' + src);
         head.appendChild(cssLink);
@@ -43,7 +41,8 @@
     if (!host) {
       // Fetch host from our own script tag
       let scriptTag = document.querySelector('script[src$="/embed.js"]');
-      if (!scriptTag) throw new Error('ember-embedded-snippet: Cannot find own script tag');
+      if (!scriptTag)
+        throw new Error('ember-embedded-snippet: Cannot find own script tag');
 
       host = scriptTag.src.replace(/(https?:\/\/.*?)\/.*/g, '$1');
     }
@@ -52,14 +51,14 @@
 
     let cssUrls = [
       prependHostIfRequired('/assets/vendor.css', host),
-      prependHostIfRequired('/assets/###APPNAME###.css', host)
+      prependHostIfRequired('/assets/###APPNAME###.css', host),
     ];
 
     injectStyles(cssUrls, head);
 
     let jsUrls = [
       prependHostIfRequired('/assets/vendor.js', host),
-      prependHostIfRequired('/assets/###APPNAME###.js', host)
+      prependHostIfRequired('/assets/###APPNAME###.js', host),
     ];
 
     await injectScripts(jsUrls, head);
@@ -74,8 +73,8 @@
 
     return require('###APPNAME###/app').default.create({
       rootElement,
-      config
-    })
+      config,
+    });
   }
 
   class EmbeddedApp extends HTMLElement {
@@ -90,13 +89,13 @@
 
       let head;
       if (this.getAttribute('shadow') !== null) {
-        this.#shadowRoot = this.attachShadow({ mode: 'open'});
+        this.#shadowRoot = this.attachShadow({ mode: 'open' });
         const rootParent = document.createElement('div');
-        const rootElement = document.createElement('div')
+        const rootElement = document.createElement('div');
         rootParent.appendChild(rootElement);
-        this.#shadowRoot.appendChild(rootParent)
+        this.#shadowRoot.appendChild(rootParent);
         this.#rootElement = rootElement;
-        head = rootParent
+        head = rootParent;
       } else {
         this.#rootElement = this;
         head = this;
@@ -108,7 +107,11 @@
     }
 
     disconnectedCallback() {
-      if (this.#application && !this.#application.isDestroyed && !this.#application.isDestroying) {
+      if (
+        this.#application &&
+        !this.#application.isDestroyed &&
+        !this.#application.isDestroying
+      ) {
         this.#application.destroy();
       }
     }

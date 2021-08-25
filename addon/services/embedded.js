@@ -1,7 +1,6 @@
 import Service from '@ember/service';
 
 export default class EmbeddedService extends Service {
-
   /**
    * The host name of our origin server, where the embedded app itself is hosted
    *
@@ -12,7 +11,8 @@ export default class EmbeddedService extends Service {
   get originHost() {
     let scriptTag = document.querySelector('script[src$="/embed.js"]');
 
-    return scriptTag ? scriptTag.src.replace(/(https?:\/\/.*?)\/.*/g, '$1') : undefined;
+    return scriptTag
+      ? scriptTag.src.replace(/(https?:\/\/.*?)\/.*/g, '$1')
+      : undefined;
   }
-
 }
