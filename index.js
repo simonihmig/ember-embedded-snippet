@@ -21,12 +21,16 @@ module.exports = {
     app.options.autoRun = false;
   },
 
-  treeForPublic: function(tree) {
+  treeForPublic: function (tree) {
     const replace = require('broccoli-replace');
     const concat = require('broccoli-concat');
 
-    const babelAddon = this.addons.find(addon => addon.name === 'ember-cli-babel');
-    const needsRegenerator = babelAddon.isPluginRequired('transform-regenerator');
+    const babelAddon = this.addons.find(
+      (addon) => addon.name === 'ember-cli-babel'
+    );
+    const needsRegenerator = babelAddon.isPluginRequired(
+      'transform-regenerator'
+    );
     const regeneratorFile = require.resolve('regenerator-runtime');
 
     const replacedTree = replace(tree, {
@@ -43,15 +47,12 @@ module.exports = {
       outputFile: '/embed.js',
       inputFiles: ['**/*'],
       headerFiles: needsRegenerator ? [regeneratorFile] : [],
-    })
+    });
 
-    return babelAddon.transpileTree(
-      concatenatedTree,
-      {
-        'ember-cli-babel': {
-          compileModules: false,
-        },
+    return babelAddon.transpileTree(concatenatedTree, {
+      'ember-cli-babel': {
+        compileModules: false,
       },
-    );
+    });
   },
 };
