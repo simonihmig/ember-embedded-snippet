@@ -129,4 +129,19 @@ module('Acceptance | embed', function (hooks) {
       });
     });
   });
+
+  module('service', function () {
+    test('custom arguments are exposed on service', async function (assert) {
+      const ce = document.createElement('dummy-app');
+      ce.setAttribute('foo', '1');
+      ce.setAttribute('bar', '2');
+      document.querySelector('#ember-testing').appendChild(ce);
+
+      await waitFor('dummy-app .title');
+
+      assert.dom('[data-test-arg]').exists({ count: 2 });
+      assert.dom('[data-test-arg="foo"]').hasText('1');
+      assert.dom('[data-test-arg="bar"]').hasText('2');
+    });
+  });
 });

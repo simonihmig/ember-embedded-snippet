@@ -1,3 +1,9 @@
 <h2 class="title">Welcome to Ember</h2>
 
-{{outlet}}
+Arguments:
+<dl>
+{{#each-in this.embedded.args as |key value|}}
+  <dt>{{key}}</dt>
+  <dd data-test-arg={{key}}>{{value}}</dd>
+{{/each-in}}
+</dl>

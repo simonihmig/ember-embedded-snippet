@@ -1,4 +1,5 @@
 import Service from '@ember/service';
+import { getOwner } from '@ember/application';
 
 export default class EmbeddedService extends Service {
   /**
@@ -14,5 +15,14 @@ export default class EmbeddedService extends Service {
     return scriptTag
       ? scriptTag.src.replace(/(https?:\/\/.*?)\/.*/g, '$1')
       : undefined;
+  }
+
+  get args() {
+    if (!this._args) {
+      // eslint-disable-next-line ember/no-side-effects
+      this._args = getOwner(this).resolveRegistration('config:embedded');
+    }
+
+    return this._args;
   }
 }
