@@ -1,3 +1,11 @@
+## v0.6.1 (2021-08-26)
+
+#### :bug: Bug Fix
+* [#143](https://github.com/kaliber5/ember-embedded-snippet/pull/143) Fix arguments not available on initial render ([@simonihmig](https://github.com/simonihmig))
+
+#### Committers: 1
+- Simon Ihmig ([@simonihmig](https://github.com/simonihmig))
+
 ## v0.6.0 (2021-08-26)
 
 #### :boom: Breaking Change
