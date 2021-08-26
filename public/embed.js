@@ -106,11 +106,9 @@
 
       await setup(head);
 
-      this.#application = await startApp(this.#rootElement);
+      window.__ember_embedded_snippet_args = this.customArgs;
 
-      this.#application.register('config:embedded', this.customArgs, {
-        instantiate: false,
-      });
+      this.#application = await startApp(this.#rootElement);
     }
 
     disconnectedCallback() {

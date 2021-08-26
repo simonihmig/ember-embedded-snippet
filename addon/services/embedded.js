@@ -1,5 +1,4 @@
 import Service from '@ember/service';
-import { getOwner } from '@ember/application';
 
 export default class EmbeddedService extends Service {
   /**
@@ -17,12 +16,6 @@ export default class EmbeddedService extends Service {
       : undefined;
   }
 
-  get args() {
-    if (!this._args) {
-      // eslint-disable-next-line ember/no-side-effects
-      this._args = getOwner(this).resolveRegistration('config:embedded');
-    }
-
-    return this._args;
-  }
+  args =
+    typeof window !== undefined ? window.__ember_embedded_snippet_args : {};
 }
