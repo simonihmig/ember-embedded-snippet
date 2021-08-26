@@ -1,3 +1,16 @@
+## v0.6.0 (2021-08-26)
+
+#### :boom: Breaking Change
+* [#141](https://github.com/kaliber5/ember-embedded-snippet/pull/141) Update to Ember 3.27, drop node 10 support ([@simonihmig](https://github.com/simonihmig))
+
+#### :rocket: Enhancement
+* [#142](https://github.com/kaliber5/ember-embedded-snippet/pull/142) Support custom arguments ([@simonihmig](https://github.com/simonihmig))
+* [#141](https://github.com/kaliber5/ember-embedded-snippet/pull/141) Update to Ember 3.27, drop node 10 support ([@simonihmig](https://github.com/simonihmig))
+
+#### Committers: 2
+- Simon Ihmig ([@simonihmig](https://github.com/simonihmig))
+- [@dependabot-preview[bot]](https://github.com/apps/dependabot-preview)
+
 ## v0.5.0 (2021-05-27)
 
 ## v0.5.0-beta.0 (2021-05-10)
