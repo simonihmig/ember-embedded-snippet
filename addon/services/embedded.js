@@ -17,5 +17,7 @@ export default class EmbeddedService extends Service {
   }
 
   args =
-    typeof window !== undefined ? window.__ember_embedded_snippet_args : {};
+    typeof window !== undefined
+      ? window.__ember_embedded_snippet_args ?? {}
+      : {};
 }
