@@ -1,5 +1,14 @@
 'use strict';
 
+function _process(app, appTree) {
+  const mergeTrees = require('broccoli-merge-trees');
+  const compileEmbedScript = require('./lib/compile-embed');
+
+  const embedTree = compileEmbedScript(app);
+
+  return mergeTrees([appTree, embedTree]);
+}
+
 module.exports = {
   name: require('./package').name,
 
@@ -21,38 +30,7 @@ module.exports = {
     app.options.autoRun = false;
   },
 
-  treeForPublic: function (tree) {
-    const replace = require('broccoli-replace');
-    const concat = require('broccoli-concat');
-
-    const babelAddon = this.addons.find(
-      (addon) => addon.name === 'ember-cli-babel'
-    );
-    const needsRegenerator = babelAddon.isPluginRequired(
-      'transform-regenerator'
-    );
-    const regeneratorFile = require.resolve('regenerator-runtime');
-
-    const replacedTree = replace(tree, {
-      files: ['**/*'],
-      patterns: [
-        {
-          match: /###APPNAME###/g,
-          replace: this.app.name,
-        },
-      ],
-    });
-
-    const concatenatedTree = concat(replacedTree, {
-      outputFile: '/embed.js',
-      inputFiles: ['**/*'],
-      headerFiles: needsRegenerator ? [regeneratorFile] : [],
-    });
-
-    return babelAddon.transpileTree(concatenatedTree, {
-      'ember-cli-babel': {
-        compileModules: false,
-      },
-    });
+  process(app, tree) {
+    return _process(app, tree);
   },
 };
