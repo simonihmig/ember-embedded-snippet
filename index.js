@@ -27,17 +27,22 @@ module.exports = {
 
   _process(appTree) {
     const mergeTrees = require('broccoli-merge-trees');
-    const compileEmbedScript = require('./lib/compile-embed');
     const ProcessHtmlPlugin = require('./lib/process-html');
 
-    const embedTree = compileEmbedScript(this.app);
-    const htmlTree = new ProcessHtmlPlugin(appTree, {
+    const processedTree = new ProcessHtmlPlugin(appTree, {
       rootURL: this._rootURL,
       ui: this.project.ui,
       appName: this.app.name,
     });
 
-    return mergeTrees([appTree, embedTree, htmlTree], { overwrite: true });
+    const babelAddon = this.app.project.findAddonByName('ember-cli-babel');
+    const compiledTree = babelAddon.transpileTree(processedTree, {
+      'ember-cli-babel': {
+        compileModules: false,
+      },
+    });
+
+    return mergeTrees([appTree, compiledTree], { overwrite: true });
   },
 
   process(app, appTree) {

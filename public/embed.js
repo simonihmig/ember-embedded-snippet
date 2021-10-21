@@ -133,10 +133,5 @@
     }
   }
 
-  let customElementName = '###APPNAME###';
-  if (!customElementName.includes('-')) {
-    customElementName += '-app';
-  }
-
-  customElements.define(customElementName, EmbeddedApp);
+  customElements.define('###CENAME###', EmbeddedApp);
 })();
