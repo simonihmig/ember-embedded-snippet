@@ -1,14 +1,5 @@
 'use strict';
 
-function _process(app, appTree) {
-  const mergeTrees = require('broccoli-merge-trees');
-  const compileEmbedScript = require('./lib/compile-embed');
-
-  const embedTree = compileEmbedScript(app);
-
-  return mergeTrees([appTree, embedTree]);
-}
-
 module.exports = {
   name: require('./package').name,
 
@@ -30,7 +21,34 @@ module.exports = {
     app.options.autoRun = false;
   },
 
-  process(app, tree) {
-    return _process(app, tree);
+  config(env, baseConfig) {
+    this._rootURL = baseConfig.rootURL;
+  },
+
+  _process(appTree) {
+    const mergeTrees = require('broccoli-merge-trees');
+    const compileEmbedScript = require('./lib/compile-embed');
+    const ProcessHtmlPlugin = require('./lib/process-html');
+
+    const embedTree = compileEmbedScript(this.app);
+    const htmlTree = new ProcessHtmlPlugin(appTree, {
+      rootURL: this._rootURL,
+      ui: this.project.ui,
+      appName: this.app.name,
+    });
+
+    return mergeTrees([appTree, embedTree, htmlTree], { overwrite: true });
+  },
+
+  process(app, appTree) {
+    let ownAddon = app.project.findAddonByName('ember-embedded-snippet');
+
+    if (!ownAddon) {
+      throw new Error(
+        "Could not find initialized ember-embedded-snippet addon. It must be part of your app's dependencies!"
+      );
+    }
+
+    return ownAddon._process(appTree);
   },
 };
