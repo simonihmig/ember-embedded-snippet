@@ -30,6 +30,12 @@ function waitFor(
 }
 
 module('Acceptance | embed', function (hooks) {
+  hooks.before(function () {
+    // Remove styles for leaking styles test.
+    // We cannot remove them from tests/index.html unfortunatly, as Embroider won't allow this
+    document.querySelector('link[href$="dummy.css"]').remove();
+  });
+
   hooks.beforeEach(function () {
     // With the way we load the JS when bootstrapping our embedded app every time, Glimmer thinks we are including
     // `@glimmer/validator` twice, which is not the case. Using this workaround here to silence the assertion.
