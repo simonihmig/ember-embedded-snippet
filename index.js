@@ -21,38 +21,39 @@ module.exports = {
     app.options.autoRun = false;
   },
 
-  treeForPublic: function (tree) {
-    const replace = require('broccoli-replace');
-    const concat = require('broccoli-concat');
+  config(env, baseConfig) {
+    this._rootURL = baseConfig.rootURL;
+  },
 
-    const babelAddon = this.addons.find(
-      (addon) => addon.name === 'ember-cli-babel'
-    );
-    const needsRegenerator = babelAddon.isPluginRequired(
-      'transform-regenerator'
-    );
-    const regeneratorFile = require.resolve('regenerator-runtime');
+  _process(appTree) {
+    const mergeTrees = require('broccoli-merge-trees');
+    const ProcessHtmlPlugin = require('./lib/process-html');
 
-    const replacedTree = replace(tree, {
-      files: ['**/*'],
-      patterns: [
-        {
-          match: /###APPNAME###/g,
-          replace: this.app.name,
-        },
-      ],
+    const processedTree = new ProcessHtmlPlugin(appTree, {
+      rootURL: this._rootURL,
+      ui: this.project.ui,
+      appName: this.app.name,
     });
 
-    const concatenatedTree = concat(replacedTree, {
-      outputFile: '/embed.js',
-      inputFiles: ['**/*'],
-      headerFiles: needsRegenerator ? [regeneratorFile] : [],
-    });
-
-    return babelAddon.transpileTree(concatenatedTree, {
+    const babelAddon = this.app.project.findAddonByName('ember-cli-babel');
+    const compiledTree = babelAddon.transpileTree(processedTree, {
       'ember-cli-babel': {
         compileModules: false,
       },
     });
+
+    return mergeTrees([appTree, compiledTree], { overwrite: true });
+  },
+
+  process(app, appTree) {
+    let ownAddon = app.project.findAddonByName('ember-embedded-snippet');
+
+    if (!ownAddon) {
+      throw new Error(
+        "Could not find initialized ember-embedded-snippet addon. It must be part of your app's dependencies!"
+      );
+    }
+
+    return ownAddon._process(appTree);
   },
 };

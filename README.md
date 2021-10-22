@@ -21,6 +21,40 @@ Installation
 ember install ember-embedded-snippet
 ```
 
+To allow compatibility with `ember-auto-import` v2 and Embroider, since `v0.7.0` the addon requires some manual 
+setup to postprocess Ember's build.
+
+In your `ember-cli-build.js` change the last part:
+
+```js
+module.exports = function (defaults) {
+  let app = new EmberAddon(defaults, {
+    // ...
+  });
+
+-  return app.toTree();
++  return require('ember-embedded-snippet').process(app, app.toTree());
+}
+```
+
+Then you should also add the custom element invocation to your `app/index.html`, so when running locally using `ember serve`
+the app is bootstrapped the same way as when it is embedded in production. See also the "Usage" below!
+
+```html
+  <body>
+    {{content-for "body"}}
+
++    <my-app-name></my-app-name>
+    
+    <script src="{{rootURL}}assets/vendor.js"></script>
+    <script src="{{rootURL}}assets/<%= name %>.js"></script>
+
+    {{content-for "body-footer"}}
+  </body>
+```
+
+> Note: doing this also for `tests/index.html` will not work, you should keep that file as-is. That means tests use the default
+> bootstrapping process of Ember.
 
 Usage
 ------------------------------------------------------------------------------

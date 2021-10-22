@@ -5,36 +5,45 @@
     console.debug('[ember-embedded-snippet] %s', msg);
   }
 
-  function injectScript(src, head) {
+  function injectScript(script, head, host) {
     return new Promise((resolve) => {
       let scriptTag = document.createElement('script');
-      scriptTag.type = 'text/javascript';
-      scriptTag.src = src;
+      for (let [name, value] of Object.entries(script)) {
+        if (name === 'src') {
+          value = prependHostIfRequired(value, host);
+          debug('Injecting script: ' + value);
+        }
+        scriptTag.setAttribute(name, value);
+      }
       scriptTag.onload = resolve;
-      debug('Injecting script: ' + src);
       head.appendChild(scriptTag);
     });
   }
 
-  async function injectScripts(jsUrls, head) {
-    for (let src of jsUrls) {
-      await injectScript(src, head);
+  async function injectScripts(scripts, head, host) {
+    for (let script of scripts) {
+      await injectScript(script, head, host);
     }
   }
 
-  function injectStyles(cssUrls, head) {
-    cssUrls.forEach((src) => {
-      let cssSelector = "link[href='" + src + "']";
+  function injectStyles(styles, head, host) {
+    for (const style of styles) {
+      let cssSelector = `link[href="${style.href}"]`;
 
-      if (head.querySelector(cssSelector) === null) {
-        let cssLink = document.createElement('link');
-        cssLink.setAttribute('rel', 'stylesheet');
-        cssLink.setAttribute('type', 'text/css');
-        cssLink.setAttribute('href', src);
-        debug('Injecting style: ' + src);
-        head.appendChild(cssLink);
+      if (head.querySelector(cssSelector) !== null) {
+        return;
       }
-    });
+
+      let cssLink = document.createElement('link');
+      for (let [name, value] of Object.entries(style)) {
+        if (name === 'href') {
+          value = prependHostIfRequired(value, host);
+          debug('Injecting style: ' + value);
+        }
+        cssLink.setAttribute(name, value);
+      }
+      head.appendChild(cssLink);
+    }
   }
 
   async function setup(head, host) {
@@ -49,19 +58,11 @@
 
     host = host.replace(/\/$/, '');
 
-    let cssUrls = [
-      prependHostIfRequired('/assets/vendor.css', host),
-      prependHostIfRequired('/assets/###APPNAME###.css', host),
-    ];
+    const styles = /###STYLES###/;
+    const scripts = /###SCRIPTS###/;
 
-    injectStyles(cssUrls, head);
-
-    let jsUrls = [
-      prependHostIfRequired('/assets/vendor.js', host),
-      prependHostIfRequired('/assets/###APPNAME###.js', host),
-    ];
-
-    await injectScripts(jsUrls, head);
+    injectStyles(styles, head, host);
+    await injectScripts(scripts, head, host);
   }
 
   function prependHostIfRequired(url, host) {
@@ -133,10 +134,5 @@
     }
   }
 
-  let customElementName = '###APPNAME###';
-  if (!customElementName.includes('-')) {
-    customElementName += '-app';
-  }
-
-  customElements.define(customElementName, EmbeddedApp);
+  customElements.define('###CENAME###', EmbeddedApp);
 })();

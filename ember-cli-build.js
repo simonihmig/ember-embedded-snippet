@@ -15,5 +15,7 @@ module.exports = function (defaults) {
   */
 
   const { maybeEmbroider } = require('@embroider/test-setup');
-  return maybeEmbroider(app);
+  const appTree = maybeEmbroider(app);
+
+  return require('./index').process(app, appTree);
 };
