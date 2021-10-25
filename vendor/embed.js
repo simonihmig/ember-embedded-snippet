@@ -8,15 +8,23 @@
   function injectScript(script, head, host) {
     return new Promise((resolve) => {
       let scriptTag = document.createElement('script');
+      let hasSrc = false;
       for (let [name, value] of Object.entries(script.attributes)) {
         if (name === 'src') {
           value = prependHostIfRequired(value, host);
+          hasSrc = true;
+          scriptTag.onload = resolve;
           debug('Injecting script: ' + value);
         }
         scriptTag.setAttribute(name, value);
       }
-      scriptTag.onload = resolve;
+      if (script.content) {
+        scriptTag.textContent = script.content;
+      }
       head.appendChild(scriptTag);
+      if (!hasSrc) {
+        resolve();
+      }
     });
   }
 

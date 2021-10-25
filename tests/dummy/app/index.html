@@ -9,7 +9,7 @@
 
     {{content-for "head"}}
 
-    <style type="text/css">
+    <style type="text/css" data-embedded-ignore>
       body {
         font-family: serif;
       }
@@ -42,6 +42,14 @@
     <script src="{{rootURL}}assets/vendor.js"></script>
     <script src="{{rootURL}}assets/dummy.js"></script>
     <script src="{{rootURL}}assets/ignore.js" data-embedded-ignore data-embroider-ignore></script>
+
+    <script>
+      var __inline_script__ = true;
+    </script>
+
+    <script data-test-json type="application/json">
+      { "foo": "bar" }
+    </script>
 
     {{content-for "body-footer"}}
   </body>
