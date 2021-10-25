@@ -8,15 +8,23 @@
   function injectScript(script, head, host) {
     return new Promise((resolve) => {
       let scriptTag = document.createElement('script');
-      for (let [name, value] of Object.entries(script)) {
+      let hasSrc = false;
+      for (let [name, value] of Object.entries(script.attributes)) {
         if (name === 'src') {
           value = prependHostIfRequired(value, host);
+          hasSrc = true;
+          scriptTag.onload = resolve;
           debug('Injecting script: ' + value);
         }
         scriptTag.setAttribute(name, value);
       }
-      scriptTag.onload = resolve;
+      if (script.content) {
+        scriptTag.textContent = script.content;
+      }
       head.appendChild(scriptTag);
+      if (!hasSrc) {
+        resolve();
+      }
     });
   }
 
@@ -26,16 +34,16 @@
     }
   }
 
-  function injectStyles(styles, head, host) {
-    for (const style of styles) {
-      let cssSelector = `link[href="${style.href}"]`;
+  function injectLinks(links, head, host) {
+    for (const style of links) {
+      let cssSelector = `link[href="${style.attributes.href}"]`;
 
       if (head.querySelector(cssSelector) !== null) {
         return;
       }
 
       let cssLink = document.createElement('link');
-      for (let [name, value] of Object.entries(style)) {
+      for (let [name, value] of Object.entries(style.attributes)) {
         if (name === 'href') {
           value = prependHostIfRequired(value, host);
           debug('Injecting style: ' + value);
@@ -43,6 +51,19 @@
         cssLink.setAttribute(name, value);
       }
       head.appendChild(cssLink);
+    }
+  }
+
+  function injectStyles(styles, head) {
+    for (const style of styles) {
+      let styleNode = document.createElement('style');
+      for (let [name, value] of Object.entries(style.attributes)) {
+        styleNode.setAttribute(name, value);
+      }
+      if (style.content) {
+        styleNode.textContent = style.content;
+      }
+      head.appendChild(styleNode);
     }
   }
 
@@ -58,10 +79,12 @@
 
     host = host.replace(/\/$/, '');
 
-    const styles = /###STYLES###/;
+    const links = /###LINKS###/;
     const scripts = /###SCRIPTS###/;
+    const styles = /###STYLES###/;
 
-    injectStyles(styles, head, host);
+    injectLinks(links, head, host);
+    injectStyles(styles, head);
     await injectScripts(scripts, head, host);
   }
 
