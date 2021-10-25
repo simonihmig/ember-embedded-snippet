@@ -26,7 +26,7 @@ setup to postprocess Ember's build.
 
 In your `ember-cli-build.js` change the last part:
 
-```js
+```diff
 module.exports = function (defaults) {
   let app = new EmberAddon(defaults, {
     // ...
@@ -40,7 +40,7 @@ module.exports = function (defaults) {
 Then you should also add the custom element invocation to your `app/index.html`, so when running locally using `ember serve`
 the app is bootstrapped the same way as when it is embedded in production. See also the "Usage" below!
 
-```html
+```diff
   <body>
     {{content-for "body"}}
 
