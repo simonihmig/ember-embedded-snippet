@@ -95,6 +95,17 @@ module('Acceptance | embed', function (hooks) {
       assert.dom('script[src$="ignore.js"]').doesNotExist();
       assert.dom('link[href$="ignore.css"]').doesNotExist();
     });
+
+    test('supports inline CSS', async function (assert) {
+      const ce = document.createElement('dummy-app');
+      document.querySelector('#ember-testing').appendChild(ce);
+
+      await waitFor('dummy-app .title');
+
+      assert.dom('dummy-app .inline-red').hasStyle({
+        color: 'rgb(255, 0, 0)',
+      });
+    });
   });
 
   module('shadowDOM', function () {
@@ -157,6 +168,21 @@ module('Acceptance | embed', function (hooks) {
 
       assert.dom('script[src$="ignore.js"]', shadowRoot).doesNotExist();
       assert.dom('link[href$="ignore.css"]', shadowRoot).doesNotExist();
+    });
+
+    test('supports inline CSS', async function (assert) {
+      const ce = document.createElement('dummy-app');
+      ce.setAttribute('shadow', '');
+      document.querySelector('#ember-testing').appendChild(ce);
+
+      await waitFor('dummy-app');
+      const shadowRoot = document.querySelector('dummy-app').shadowRoot;
+      assert.ok('Expected shadow root', !!shadowRoot);
+      await waitFor('.title', { doc: shadowRoot });
+
+      assert.dom('.inline-red', shadowRoot).hasStyle({
+        color: 'rgb(255, 0, 0)',
+      });
     });
   });
 
