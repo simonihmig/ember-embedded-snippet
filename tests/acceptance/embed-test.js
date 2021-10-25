@@ -85,6 +85,16 @@ module('Acceptance | embed', function (hooks) {
         color: 'rgb(0, 0, 255)',
       });
     });
+
+    test('can ignore files', async function (assert) {
+      const ce = document.createElement('dummy-app');
+      document.querySelector('#ember-testing').appendChild(ce);
+
+      await waitFor('dummy-app .title');
+
+      assert.dom('script[src$="ignore.js"]').doesNotExist();
+      assert.dom('link[href$="ignore.css"]').doesNotExist();
+    });
   });
 
   module('shadowDOM', function () {
@@ -133,6 +143,20 @@ module('Acceptance | embed', function (hooks) {
       assert.dom('.something').hasStyle({
         color: 'rgb(255, 0, 0)',
       });
+    });
+
+    test('can ignore files', async function (assert) {
+      const ce = document.createElement('dummy-app');
+      ce.setAttribute('shadow', '');
+      document.querySelector('#ember-testing').appendChild(ce);
+
+      await waitFor('dummy-app');
+      const shadowRoot = document.querySelector('dummy-app').shadowRoot;
+      assert.ok('Expected shadow root', !!shadowRoot);
+      await waitFor('.title', { doc: shadowRoot });
+
+      assert.dom('script[src$="ignore.js"]', shadowRoot).doesNotExist();
+      assert.dom('link[href$="ignore.css"]', shadowRoot).doesNotExist();
     });
   });
 
