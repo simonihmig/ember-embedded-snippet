@@ -1,3 +1,22 @@
+
+## v0.7.0 (2021-10-26)
+
+#### :boom: Breaking Change
+* [#148](https://github.com/kaliber5/ember-embedded-snippet/pull/148) Major refactoring of `embed.js` generation and app integration ([@simonihmig](https://github.com/simonihmig))
+
+#### :rocket: Enhancement
+* [#165](https://github.com/kaliber5/ember-embedded-snippet/pull/165) Support inline `<script>` and `<style>` tags ([@simonihmig](https://github.com/simonihmig))
+* [#164](https://github.com/kaliber5/ember-embedded-snippet/pull/164) Ignore scripts/CSS tagged with `data-embedded-ignore` ([@simonihmig](https://github.com/simonihmig))
+* [#155](https://github.com/kaliber5/ember-embedded-snippet/pull/155) Add Embroider support ([@simonihmig](https://github.com/simonihmig))
+* [#149](https://github.com/kaliber5/ember-embedded-snippet/pull/149) Compatibility with ember-auto-import v2 and Ember 4 ([@simonihmig](https://github.com/simonihmig))
+* [#148](https://github.com/kaliber5/ember-embedded-snippet/pull/148) Major refactoring of `embed.js` generation and app integration ([@simonihmig](https://github.com/simonihmig))
+
+#### :bug: Bug Fix
+* [#145](https://github.com/kaliber5/ember-embedded-snippet/pull/145) Make sure `args` are never undefined ([@simonihmig](https://github.com/simonihmig))
+
+#### Committers: 1
+- Simon Ihmig ([@simonihmig](https://github.com/simonihmig))
+
 ## v0.6.1 (2021-08-26)
 
 #### :bug: Bug Fix
