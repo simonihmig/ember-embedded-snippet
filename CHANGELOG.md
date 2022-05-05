@@ -1,4 +1,13 @@
 
+
+## v0.7.1 (2022-05-05)
+
+#### :rocket: Enhancement
+* [#181](https://github.com/kaliber5/ember-embedded-snippet/pull/181) Load scripts in parallel instead of sequentially ([@simonihmig](https://github.com/simonihmig))
+
+#### Committers: 1
+- Simon Ihmig ([@simonihmig](https://github.com/simonihmig))
+
 ## v0.7.0 (2021-10-26)
 
 #### :boom: Breaking Change
