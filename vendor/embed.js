@@ -21,6 +21,9 @@
       if (script.content) {
         scriptTag.textContent = script.content;
       }
+      scriptTag.defer = true;
+      scriptTag.async = false;
+
       head.appendChild(scriptTag);
       if (!hasSrc) {
         resolve();
@@ -29,9 +32,9 @@
   }
 
   async function injectScripts(scripts, head, host) {
-    for (let script of scripts) {
-      await injectScript(script, head, host);
-    }
+    await Promise.all(
+      scripts.map((script) => injectScript(script, head, host))
+    );
   }
 
   function injectLinks(links, head, host) {
