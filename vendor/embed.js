@@ -160,5 +160,9 @@
     }
   }
 
-  customElements.define('###CENAME###', EmbeddedApp);
+  let definition = customElements.get('###CENAME###');
+
+  if (definition == null) {
+    customElements.define('###CENAME###', EmbeddedApp);
+  }
 })();
