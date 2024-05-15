@@ -18,14 +18,19 @@ module.exports = {
     app.options.storeConfigInMeta = false;
 
     // we start the app explicitly
-    app.options.autoRun = false;
+    app.options.autoRun = this._isAddonDisabled ?? false;
   },
 
   config(env, baseConfig) {
     this._rootURL = baseConfig.rootURL;
+    this._isAddonDisabled = baseConfig['ember-embedded-snippet'].disabled ?? false;
   },
 
   _process(appTree) {
+    if (this._isAddonDisabled) {
+      return appTree;
+    }
+
     const mergeTrees = require('broccoli-merge-trees');
     const ProcessHtmlPlugin = require('./lib/process-html');
 
